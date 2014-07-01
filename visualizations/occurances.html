@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Occurances</title>
+	<script type="text/javascript" src="libs/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="libs/highcharts/js/highcharts.js"></script>
+	<style type="text/css">
+		#container {
+			width: 100%;
+			height: 500px;
+		}
+	</style>
+</head>
+<body>
+<div id="title">Occurances</div>
+<div id="container"></div>
+
+<script type="text/javascript">
+	$(function () {
+
+		$.get('http://localhost:3000/mnhs/occurances_bydate', function(data) {
+
+			var series = [],
+				len = data.length;
+
+			for (var i = 0; i < len; i++) {
+				series.push([
+					Date.parse(data[i]["_id"]),
+					data[i]["value"]
+				]);	
+			}
+
+			console.log(series);
+	        $('#container').highcharts({
+	            chart: {
+	                type: 'spline'
+	            },
+	            title: {
+	                text: 'Snow depth at Vikjafjellet, Norway'
+	            },
+	            subtitle: {
+	                text: 'Irregular time data in Highcharts JS'
+	            },
+	            xAxis: {
+	                type: 'datetime',
+	                dateTimeLabelFormats: { // don't display the dummy year
+	                    month: '%e. %b',
+	                    year: '%b'
+	                },
+	                title: {
+	                    text: 'Date'
+	                }
+	            },
+	            yAxis: {
+	                title: {
+	                    text: 'Snow depth (m)'
+	                },
+	                min: 0
+	            },
+	            tooltip: {
+	                headerFormat: '<b>{series.name}</b><br>',
+	                pointFormat: '{point.x:%e. %b}: {point.y:.2f} m'
+	            },
+
+	            series: [{
+	                name: 'Occurances of Influenza',
+	                // Define the data points. All series have a dummy year
+	                // of 1970/71 in order to be compared on the same x axis. Note
+	                // that in JavaScript, months start at 0 for January, 1 for February etc.
+	                data: series
+	            }]
+	        });
+		});
+    });
+</script>
+</body>
+</html>

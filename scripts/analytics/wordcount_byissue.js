@@ -1,3 +1,7 @@
+/**
+ * Generate a collection that contains word counts (occurances) for each edition containing the 
+ * specified word.
+ */
 var MongoClient = require('mongodb').MongoClient,
     format = require('util').format;
 
