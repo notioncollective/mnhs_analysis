@@ -4,7 +4,7 @@
 This repository holds code used to fetch and analyze the MNHS newspaper archives found on chroniclingamerica.loc.gov. **Note: Data is not included in this repository, but can be fetched using the scripts provided.**
 
 ## Loading data
-The data is downloaed and stored in a local MongoDB using the scripts in ```scripts/chronicling_america_download```. These are rather messy, and must be run in a sequence; given time, they should be refactored into a single script with a flexible API that performs the entire download (and perhaps can download any of the batches available on Chronicling America). There is much room for optimization via the use of multiple threads and bulk writes to mongo.
+The data is downloaed and stored in a local MongoDB using the scripts in ```scripts/chronicling_america_download```. These are rather messy, and must be run in a sequence; they should eventually be refactored into a single script with a flexible API that performs the entire download (and perhaps can download any of the batches available on Chronicling America). There is much room for optimization via the use of multiple threads and bulk writes to Mongo.
 
 ## Data Structure in MongoDB
 Once the download of the data is complete, the structure in MongoDB is as shown below. For pages where OCR text does exist, it is included in the ```ocr``` property. The example below does not have OCR available, thus shows "no_text" in this field.
@@ -71,7 +71,7 @@ Once the download of the data is complete, the structure in MongoDB is as shown 
 ```
 
 ## Data Analysis
-For simple analysis, we use MongoDB's mapReduce features. Examples can be found in ```scripts/analytics```. The scripts use the standard mongodb driver for node to generate new collections in Mongo based on the supplied map and reduce functions.
+For simple analysis, we use MongoDB's mapReduce features. Examples can be found in ```scripts/analytics```. The scripts use the standard Mongodb driver for node to generate new collections in Mongo based on the supplied map and reduce functions.
 
 ## Data Server
-In order to start to visualize some of the data, I've created a basic express application that can query the Mongo database and supply the results to a client in standard JSON format.
+In order to start to visualize some of the data, I've created a basic Express application that can perform queries on the Mongo database and supply the results to a client in standard JSON format.
