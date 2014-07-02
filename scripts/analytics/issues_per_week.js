@@ -26,7 +26,7 @@ function map() {
     var date = new Date(this.date_issued);
     var first = date.getDate() - date.getDay();
     var week = new Date(date.setDate(first));
-    emit(week.toDateString(), 1);
+    emit(week.toISOString(), 1);
 }
 
 function reduce(date, issues) {
