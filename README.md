@@ -75,3 +75,13 @@ For simple analysis, we use MongoDB's mapReduce features. Examples can be found 
 
 ## Data Server
 In order to start to visualize some of the data, I've created a basic Express application that can perform queries on the Mongo database and supply the results to a client in standard JSON format.
+
+## Example Aggregations:
+After running
+```
+$ node wordcount_byissue.js snow
+```
+We can run the following in the mongo shell to get the average number of times the word "snow" appears in an issue:
+```
+> db.snow_occurances_byissue.aggregate([{ $group: { "_id": "$value.group", average: { $avg: "$value.occurances"}}}]);
+```

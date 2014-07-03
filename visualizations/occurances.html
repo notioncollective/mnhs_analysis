@@ -32,7 +32,10 @@
 			console.log(series);
 	        $('#container').highcharts({
 	            chart: {
-	                type: 'spline'
+	                type: 'line',
+	                series: {
+	                	connectNulls: false
+	                }
 	            },
 	            title: {
 	                text: 'Occurances Per Issue Per Week'

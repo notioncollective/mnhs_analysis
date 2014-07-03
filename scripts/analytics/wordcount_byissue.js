@@ -21,7 +21,11 @@ MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
     var editions = db.collection('editions');
 
     editions.mapReduce(map, reduce, {
-    		query: { '$text': { '$search': searchWord }},
+            // if we want to ONLY return docs that contain the search term:
+    		// query: { '$text': { '$search': searchWord }},
+         
+            // if we want to return all
+            query: {},
 
     		// The scope provides variables to the map/reduce functions
     		scope: {regex: regex},
@@ -67,12 +71,11 @@ function map() {
     };
 
     // if there are no occurances, do not emit anything.
-    if (totalOccurances == 0) return;
+    // UPDATE: I think it makes more sense to return a zero here rather than omit the record
+    // if (totalOccurances == 0) return;
 
     // for each newspaper edition, emit the total occurances of the word:
-    emit(this._id, {
-        occurances: totalOccurances
-    });
+    emit(this._id, { occurances: totalOccurances, group: 1});
 }
 
 function reduce(key, values) {

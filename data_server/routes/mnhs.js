@@ -30,7 +30,7 @@ router.get('/influenza_occurances_per_issue_per_week', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var occurances_bydate = db.collection('influenza_occurances_per_issue_per_week');
+        var occurances_bydate = db.collection('typhoid_occurances_per_issue_per_week');
 
         occurances_bydate
             .find({})

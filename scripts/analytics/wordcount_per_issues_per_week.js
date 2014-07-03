@@ -79,24 +79,27 @@ function map() {
     var value = {
         occurances: totalOccurances,
         issues: 1,
-        occurancesPerIssue: 0
+        occurancesPerIssue: totalOccurances
     };
     emit(week.toISOString(), value);
 }
 
 function reduce(date, values) {
+
     var weeklyOccurances = 0,
         weeklyIssues = 0,
-        occurancesPerIssue;
+        opi = 0;
 
-    for (var i = 0; i < values.length; i++) {
-        weeklyOccurances += values[i].occurances;
-        weeklyIssues += values[i].issues;
-    }
-    occurancesPerIssue = weeklyOccurances / weeklyIssues;
+    
+        for (var i = 0; i < values.length; i++) {
+            weeklyOccurances += values[i].occurances;
+            weeklyIssues += values[i].issues;
+        }
+
+    opi = weeklyOccurances / weeklyIssues;      
     return { 
         occurances: weeklyOccurances,
         issues: weeklyIssues,
-        occurancesPerIssue: occurancesPerIssue
+        occurancesPerIssue: opi
     };
 }
