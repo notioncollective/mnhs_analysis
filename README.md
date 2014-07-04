@@ -85,3 +85,19 @@ We can run the following in the mongo shell to get the average number of times t
 ```
 > db.snow_occurances_byissue.aggregate([{ $group: { "_id": "$value.group", average: { $avg: "$value.occurances"}}}]);
 ```
+
+# Todos
+
+- Write script to gather word counts for each edition
+- Import publications from Chron America api
+- Document/package Chronicling America API scraper
+- Add more functionality to express server for ease of use
+- MOAR VISUALIZATIONS
+	- Simple dashboard to give us a lay-o-the-land
+	- Do some tests with more interesting questions/data
+		- Immigrant populations ("Norwegians", "Swedes" etc.)
+		- Weather ("snow" etc.)
+		- Spread of disease, etc
+		- Cultural trends?
+	- Could we do an OCR quality / legibility rating?
+- Scripts for generating corpii based on queries? Is that actually helpful?
