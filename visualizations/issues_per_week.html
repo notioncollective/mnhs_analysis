@@ -32,7 +32,8 @@
 			console.log(series);
 	        $('#container').highcharts({
 	            chart: {
-	                type: 'spline'
+	                type: 'scatter',
+	                zoomType: 'x'
 	            },
 	            title: {
 	                text: 'Number of available issues per week'

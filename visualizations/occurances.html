@@ -32,10 +32,8 @@
 			console.log(series);
 	        $('#container').highcharts({
 	            chart: {
-	                type: 'line',
-	                series: {
-	                	connectNulls: false
-	                }
+	                type: 'scatter',
+	                zoomType: 'x'
 	            },
 	            title: {
 	                text: 'Occurances Per Issue Per Week'
