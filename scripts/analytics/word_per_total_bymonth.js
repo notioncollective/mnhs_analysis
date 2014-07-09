@@ -12,7 +12,7 @@ if (process.argv.length < 3) {
 }
 
 var searchWord = process.argv[2],
-    regex = new RegExp(searchWord, "i");
+    regex = new RegExp("\s+"+searchWord+"\s+", "i");
 
 MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
     if (err) throw err;
@@ -83,37 +83,32 @@ function map() {
     }
 
     var date = new Date(this.date_issued);
-    var month = new Date(date.setDate(1));
+    var month = new Date(date.getFullYear(), date.getMonth(), 1);
 
     // for each newspaper edition, emit the total word count
     if (hasOcrContent) {
         emit(month.toISOString(), {
             totalWords: totalWords,
-            totalOccurances: totalOccurances
+            totalOccurances: totalOccurances,
+            occurancesPerWords: totalOccurances / totalWords
         });
     }
 }
 
 function reduce(key, values) {
-    var monthlyOccurances = 0,
-        monthlyWords = 0,
-        opwpm = 0;
+    var result = {
+            totalWords: 0,
+            totalOccurances: 0,
+            occurancesPerWords: 0
+        };
 
+    var len = values.length;
 
-    for (var i = 0; i < values.length; i++) {
-        monthlyOccurances += values[i].totalOccurances;
-        monthlyWords += values[i].totalWords;
+    for (var i = 0; i < len; i++) {
+        result.totalOccurances += values[i].totalOccurances;
+        result.totalWords += values[i].totalWords;
     }
+    result.occurancesPerWords = result.totalOccurances / result.totalWords;
 
-    opwpm = monthlyOccurances / monthlyWords;
-    return opwpm;
+    return result;
 }
-
-/**
-    db.snow_per_total_words_bymonth.aggregate({ $project : {
-        "_id" : 1 ,
-        stats : {
-            monthlyWordsPerTotal : { $divide: ["$value.totalOccurances","$value.totalWords"] }
-        }
-    }})
- */
