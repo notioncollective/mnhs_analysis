@@ -9,7 +9,7 @@ MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
     editions.mapReduce(map, reduce, {
             query: {},
             // collection into which the result will be saved
-            out: "issues_per_date"
+            out: "publications"
         },
 
         function(err, results) {
@@ -23,9 +23,9 @@ MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
 
 function map() {
     // emit the date_issued as key, will sum in 
-    emit(this.date_issued, 1);
+    emit(this.title.url, 1);
 }
 
-function reduce(date, issues) {
+function reduce(url, issues) {
     return Array.sum(issues);
 }

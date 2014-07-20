@@ -1,5 +1,5 @@
 /**
- * This script loops through the local "editions" collection in mongodb, the calls out to each edition URL in order to 
+ * This script loops through the local "publications" collection in mongodb, the calls out to each edition URL in order to 
  * fetch the OCR text which then gets added to the edition document.
  * 
  */
@@ -7,7 +7,7 @@ var MongoClient = require('mongodb').MongoClient,
     format = require('util').format,
     request = require('request');
 
-var editions = [],
+var publications = [],
     pages = [];
 var curBatch = 0,
     numBatches;
@@ -21,63 +21,42 @@ var brokenLinks = [];
 
 
 /**
- * Fetch all editions for which pages.ocr does not yet exist, loop through the results and update 
+ * Fetch all publications for which pages.ocr does not yet exist, loop through the results and update 
  * them to include the OCR text.
  */
 MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
     if (err) throw err;
 
     var collection = db
-        .collection('editions')
-        .find({"pages.ocr": {"$exists": false}}, {"pages":1})
+        .collection('publications')
+        .find({})
         .toArray(function(err, docs) {
-            editions = docs;
-            numEditions = editions.length;
-            console.log(numEditions + " total editions");
+            publications = docs;
+            numPubs = publications.length;
+            console.log(numPubs + " total publications");
             db.close();
 
-            // loop through all editions
-            for (var i = 0; i < numEditions; i++) {
-                var numPages = editions[i].pages.length;
-                // loop through all pages in each edition, and construct the ocr URL based on its page URL.
-                for (var j = 0; j < numPages; j++) {
-                    var page_url = editions[i].pages[j].url;
-                    var ocr_url = page_url.substr(0, page_url.length - 5) + "/ocr.txt";
-                    var page = {
-                        edition_id: editions[i]["_id"],
-                        page_url: editions[i].pages[j].url,
-                        ocr_url: ocr_url
-                    }
-                    pages.push(page);
-                }
-            }
-
-            console.log(pages.length + " total pages");
-            // console.log(pages[0]);
-
-            // addOcr(pages[0]);
-            updateDocuments(pages, "editions", wrapUp);
+            updateDocuments(publications, "publications", wrapUp);
 
         });
 });
 
 /**
- * This is a little convoluted. Here we take an array of ALL the pages from ALL the editions, and for each one
+ * This is a little convoluted. Here we take an array of ALL the pages from ALL the publications, and for each one
  * go out and fetch its OCR text, then update its corresponding edition document in local Mongo.
  */
 function updateDocuments(documents, collectionName, callback) {
-    console.log("saveDocuments");
     var curDocument = 0,
         numDocuments = documents.length;
 
     updateDocument(documents[curDocument], collectionName);
 
-    // Update the specific page. The edition id is stored on the page_obj.
-    function updateDocument(page_obj, collectionName) {
+    // Update the specific page. The edition id is stored on the publication.
+    function updateDocument(publication, collectionName) {
         
         // Fetch the OCR text
         request({
-            url: page_obj.ocr_url,
+            url: publication["_id"],
             json: true
         }, function(error, response, body) {
 
@@ -89,20 +68,13 @@ function updateDocuments(documents, collectionName, callback) {
                     var collection = db.collection(collectionName);
 
                     collection.update({
-                        "_id": page_obj.edition_id,
-                        "pages.url": page_obj.page_url
-                    }, {
-                        '$set': {
-                            "pages.$.ocr": body
-                        }
-                    }, {
-                        'upsert': true
-                    }, function(err, docs) {
+                        "_id": publication["_id"]
+                    }, body, {}, function(err, docs) {
                         if (err) {
                             console.log(err);
                         }
 
-                        // Successfully updated edition record.
+                        // Successfully updated publication record.
 
                         db.close();
 
@@ -124,7 +96,7 @@ function updateDocuments(documents, collectionName, callback) {
                 // console.log(body);
                 console.log("-------> PROBLEM <-------");
                 numErrors += 1;
-                brokenLinks.push(page_obj.ocr_url);
+                brokenLinks.push(publication.ocr_url);
 
                 curDocument += 1;
 
