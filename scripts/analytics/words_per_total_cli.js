@@ -11,19 +11,27 @@
  *
  * The example here will find the occurances of the words 'war' and 'peace' per total words, aggregated by month.
  * 
- * The new collection will be called 'war_peace_occurrances_per_total_bymonth' and will contain objects in the following format:
+ * The new collection will be called 'war_peace_occurrances_per_total_by_month' and will contain objects in the following format:
  *
  * {
- *     "_id" : "1856-01-01T05:00:00.000Z",
- *     "value" : {
- *         "totalWords" : 27163,
- *         "total_war_occurrances" : 2,
- *         "total_peace_occurrances" : 10,
- *         "war_occurrances_per_total_words" : 0.00007362956963516548,
- *         "peace_occurrances_per_total_words" : 0.0003681478481758274,
- *         "war_occurrance_percent" : 0.16666666666666666,
- *         "peace_occurrance_percent" : 0.8333333333333333
- *     }
+ *    "_id" : "1856-01-01T05:00:00.000Z",
+ *    "value" : {
+ *        "totalWords" : 27163,
+ *        "words" : [
+ *            {
+ *                "word" : "war",
+ *                "total_occurrances" : 2,
+ *                "occurrances_per_total" : 0.00007362956963516548,
+ *                "occurrances_percent" : 0.39999999999999997
+ *            },
+ *            {
+ *                "word" : "peace",
+ *                "total_occurrances" : 3,
+ *                "occurrances_per_total" : 0.00011044435445274823,
+ *                "occurrances_percent" : 0.6
+ *            }
+ *        ]
+ *    }
  * }
  * 
  */

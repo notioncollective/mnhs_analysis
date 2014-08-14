@@ -1,25 +1,5 @@
 /**
  * Generate a collection that contains the number of [searchTerm] per total number of words per month.
- * 
- * TODO: refactor the output so that the results can be easily iterated over. Something like this:
- *
- * {
- *     "_id" : "1856-01-01T05:00:00.000Z",
- *     "value" : {
- *         "totalWords" : 27163,
- *         "words": [{
- *             word: "war",
- *             total_occurrances: 2,
- *             occurrances_per_total: 0.00007362956963516548,
- *             occurrances_percent: 0.16666666666666666
- *         },{
- *             word: "peace",
- *             total_occurrances: 10,
- *             occurrances_per_total: 0.0003681478481758274,
- *             occurrances_percent: 0.8333333333333333
- *         }]
- *     }
- * }
  */
 var MongoClient = require('mongodb').MongoClient,
     format = require('util').format,
@@ -29,13 +9,7 @@ var MongoClient = require('mongodb').MongoClient,
 
 
 /**
- * _executeQuery gets passed an object of regexp objects that will be used as search tokens.
- *
- * Ex. Config
- * {
- *     "war": /\s+war\s+/gi,
- *     "peace": /\s+peace\s+/gi
- * }
+ * _executeQuery gets passed an array of strings that will be used as search tokens and compared.
  *
  * @param  {[type]} regexArray [description]
  * @return {[type]}            [description]
@@ -87,6 +61,10 @@ function _executeQuery(config) {
     });
 }
 
+/**
+ * Determine if the results should be aggregated by week, month, or year.
+ * @param {[type]} aggLev [description]
+ */
 function _setAggregationLevel(aggLev) {
     if (aggLev !== 'week' && aggLev !== 'month' && aggLev !== 'year') {
         console.log('The first argument must be an aggregation level: week, month, or year');
@@ -96,6 +74,21 @@ function _setAggregationLevel(aggLev) {
     }
 }
 
+/**
+ * Generate the collection name based on the array of config words.
+ *
+ * Ex:
+ *
+ * // for Aggregation Level 'month'
+ * 
+ * _generateCollectionName(['war', 'peace'])
+ *
+ * // returns war_peace_occurances_per_total_by_month
+ *
+ * 
+ * @param  {[type]} config [description]
+ * @return {[type]}        [description]
+ */
 function _generateCollectionName(config) {
     var collectionName = '';
     for (var word in config) {
@@ -148,11 +141,6 @@ function map() {
             // print("CONFIG[j]: " + CONFIG[j]);
             var regex = new RegExp("\\s+" + CONFIG[j] + "\\s+", "gi");
             results[CONFIG[j]] = ocr.match(regex);
-            // print("results[CONFIG[j]]: " + results[CONFIG[j]]);
-            // results.push(result);
-
-            // setup output object
-            // output["total_" + CONFIG[j] + "_occurrances"] = 0;
         }
 
         // print("page: " + i);
@@ -218,10 +206,8 @@ function reduce(key, values) {
 
         // loop through config and process each entry
         for (var j in CONFIG) {
-            // print(CONFIG[j] + ": " + values[i]["total_" + CONFIG[j] + "_occurrances"]);
             // sum values for this year
             result.words[j].total_occurrances += values[i].words[j].total_occurrances;
-            // result["total_" + CONFIG[j] + "_occurrances"] += values[i]["total_" + CONFIG[j] + "_occurrances"];
         };
     }
 
@@ -242,9 +228,6 @@ function finalize(key, reducedValue) {
         reducedValue.words[j].occurrances_percent = summed_occurrances_per_total ? reducedValue.words[j].occurrances_per_total / summed_occurrances_per_total : 0;
     }
 
-    // reducedValue.warToPeaceRatio = reducedValue.warOccurancesPerWords / reducedValue.peaceOccurancesPerWords;
-    // reducedValue.warOccurancesPerWords = reducedValue.totalWarOccurances / reducedValue.totalWords;
-    // reducedValue.peaceOccurancesPerWords = reducedValue.totalPeaceOccurances / reducedValue.totalWords;
     return reducedValue;
 }
 
