@@ -4,15 +4,15 @@
 var MongoClient = require('mongodb').MongoClient,
     format = require('util').format;
 
-if (process.argv.length < 3) {
-    console.log("\nERROR: Please supply a search term as argument.\n");
-    console.log("USAGE:");
-    console.log("$ node wordcount_byissue.js searchterm\n");
-    process.exit(0);
-}
+// if (process.argv.length < 3) {
+//     console.log("\nERROR: Please supply a search term as argument.\n");
+//     console.log("USAGE:");
+//     console.log("$ node wordcount_byissue.js searchterm\n");
+//     process.exit(0);
+// }
 
-var searchWord = process.argv[2],
-    regex = new RegExp(searchWord, "i");
+// var searchWord = process.argv[2],
+//     regex = new RegExp(searchWord, "i");
 
 MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
     if (err) throw err;
@@ -28,7 +28,7 @@ MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
 
             // The scope provides variables to the map/reduce functions
             scope: {
-                REGEX: regex,
+                // REGEX: regex,
                 OCR_EMPTY_STR: 'no_text'
             },
 
@@ -38,7 +38,7 @@ MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
             finalize: finalize,
 
             // collection into which the result will be saved
-            out: searchWord + "_per_total_words_bymonth"
+            out: "war_and_peace_per_total_words_bymonth"
         },
 
         function(err, results) {
@@ -55,7 +55,8 @@ function map() {
     var pages = this.pages,
         numPages = pages.length,
         totalWords = 0,
-        totalOccurances = 0,
+        totalWarOccurances = 0,
+        totalPeaceOccurances = 0,
         hasOcrContent = false;
 
     for (var i = 0; i < numPages; i++) {
@@ -71,7 +72,8 @@ function map() {
         // find all matchs of non-whitespace sequences
         var words = ocr.match(/\S+/g);
 
-        var searchTerms = ocr.match(/\s+war\s+/gi);
+        var war = ocr.match(/\s+war\s+/gi);
+        var peace = ocr.match(/\s+peace\s+/gi);
 
         // if there are no words, go to next page
         if (words == null) {
@@ -79,9 +81,13 @@ function map() {
         } else {
             // print('words: ' + words.length);
             totalWords += words.length;
-            if (searchTerms !== null) {
-                print('searchMatches: ' + searchTerms.length);
-                totalOccurances += searchTerms.length;
+            if (war !== null) {
+                print('searchMatches: ' + war.length);
+                totalWarOccurances += war.length;
+            }
+            if (peace !== null) {
+                print('searchMatches: ' + peace.length);
+                totalPeaceOccurances += peace.length;
             }
         }
     }
@@ -93,28 +99,35 @@ function map() {
     if (hasOcrContent) {
         emit(month.toISOString(), {
             totalWords: totalWords,
-            totalOccurances: totalOccurances
+            totalWarOccurances: totalWarOccurances,
+            totalPeaceOccurances: totalPeaceOccurances
         });
     }
 }
 
+// Aggregate war and peace occurances and total words
 function reduce(key, values) {
     var result = {
             totalWords: 0,
-            totalOccurances: 0
+            totalWarOccurances: 0,
+            totalPeaceOccurances: 0
         };
 
     var len = values.length;
 
     for (var i = 0; i < len; i++) {
-        result.totalOccurances += values[i].totalOccurances;
+        result.totalWarOccurances += values[i].totalWarOccurances;
+        result.totalPeaceOccurances += values[i].totalPeaceOccurances;
         result.totalWords += values[i].totalWords;
     }
 
     return result;
 }
 
+// Add additional metrics based on reduces values
 function finalize(key, reducedValue) {
-    reducedValue.occurancesPerWords = reducedValue.totalOccurances / reducedValue.totalWords;
+    reducedValue.warOccurancesPerWords = reducedValue.totalWarOccurances / reducedValue.totalWords;
+    reducedValue.peaceOccurancesPerWords = reducedValue.totalPeaceOccurances / reducedValue.totalWords;
+    reducedValue.warToPeaceRatio = reducedValue.warOccurancesPerWords / reducedValue.peaceOccurancesPerWords;
     return reducedValue;
 }

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Issues Per Week</title>
+	<script type="text/javascript" src="libs/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="libs/highcharts/js/highcharts.js"></script>
+	<script type="text/javascript" src="libs/lodash.js"></script>
+	<style type="text/css">
+		body, html {
+			padding: 0;
+			margin: 0;
+			height: 100%;
+		}
+		.container {
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+		.row {
+			position: relative;
+			width: 100%;
+		}
+		.war {
+			position: relative;
+			height: 100%;
+			background: #FF8566;
+			float: left;
+		}
+		.peace {
+			position: relative;
+			height: 100%;
+			background: #507699;
+			float: left;
+		}
+	</style>
+</head>
+<body>
+<div id="WarAndPeace" class="container">
+	
+</div>
+
+
+
+<script type="text/javascript">
+
+	/**
+	 * takes an array of objects like: 
+	 * {
+	 * 		name: [name],
+	 * 		value: [value]
+	 * }
+	 * @param  {[type]} l      [description]
+	 * @param  {[type]} target [description]
+	 * @return {[type]}        [description]
+	 */
+	function lrm_round(l, target) {
+		target = target || 100;
+
+		var wholeSum = 0;
+
+		// 1. multiply by target to get whole numbers and remainders
+		_.forEach(l, function(el, index) {
+			el.value = el.value * target;
+			el.wholeNumber = Math.floor(el.value);
+			el.remainder = el.value - el.wholeNumber;
+
+			// 2. sum up whole numbers
+			wholeSum += el.wholeNumber;
+			console.log(el);
+		});
+
+	    // 3. sort by remainder from high to low
+	    var sorted = _.sortBy(l, "remainder").reverse();
+
+		
+
+	    console.log("sorted: ", sorted);
+
+	    // 4. Add 1 to the whole number components with the associated largest remainders until the sum equals n.
+	    _.forEach(sorted, function(el, index) {
+	    	var valueToAdd = target - wholeSum > 0 ? 1 : -1;
+	    	wholeSum += valueToAdd;
+	    	el.wholeNumber += valueToAdd; 
+	    	if (target === wholeSum) {
+	    		return false;
+	    	}
+	    });
+
+	    return sorted;
+	}
+
+	$(function () {
+
+		$.get('http://localhost:3000/mnhs/war_and_peace_by_month', function(data) {
+
+			var warSeries = [],
+				peaceSeries = [],
+				ratioSeries = [],
+				len = data.length,
+				$WarAndPeace = $('#WarAndPeace'),
+				wH = $(window).height(),
+				rowHeight = 100 / len;
+
+
+			for (var i = 0; i < len; i++) {
+				var $row = $('<div class="row" />');
+					$row.data('stats', data[i]["value"]);
+				var $war = $('<div class="war" />');
+				var $peace = $('<div class="peace" />');
+
+				// var ratio = data[i]["value"]["warToPeaceRatio"];
+				console.log(data[i]["value"]["war_occurrance_percent"], data[i]["value"]["peace_occurrance_percent"]);
+
+				// do the correct rounding so that our percentages add up to 100%
+				var percentages = lrm_round([{
+					"name": "war",
+					"value": data[i]["value"]["war_occurrance_percent"]
+				},{
+					"name": "peace",
+					"value": data[i]["value"]["peace_occurrance_percent"]
+				}]);
+
+				$row.height(rowHeight + "%");
+
+
+				var warWidth = _.find(percentages, {name: "war"});
+				var peaceWidth = _.find(percentages, {name: "peace"});
+				$war.width(warWidth.wholeNumber + "%");
+				$peace.width(peaceWidth.wholeNumber + "%");
+
+
+				$row.append($war).append($peace);
+
+				$WarAndPeace.append($row);
+			}
+
+			// $(document).on('mouseover', '.row', function() {
+			// 	$(this).height("40px");
+			// });
+			// $(document).on('mouseout', '.row', function() {
+			// 	$(this).height(rowHeight + "%");
+			// });
+		});
+    });
+</script>
+</body>
+</html>

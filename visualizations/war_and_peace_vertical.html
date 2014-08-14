@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Issues Per Week</title>
+	<script type="text/javascript" src="libs/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="libs/highcharts/js/highcharts.js"></script>
+	<style type="text/css">
+		body, html {
+			padding: 0;
+			margin: 0;
+			height: 100%;
+		}
+		.container {
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+		.row {
+			position: relative;
+			width: 100%;
+		}
+		.war {
+			position: relative;
+			height: 100%;
+			background: #900;
+			float: left;
+		}
+		.peace {
+			position: relative;
+			height: 100%;
+			background: #009;
+			float: left;
+		}
+	</style>
+</head>
+<body>
+<div id="WarAndPeace" class="container">
+	
+</div>
+
+
+
+<script type="text/javascript">
+	$(function () {
+
+		$.get('http://localhost:3000/mnhs/war_and_peace_by_year', function(data) {
+
+			var warSeries = [],
+				peaceSeries = [],
+				ratioSeries = [],
+				len = data.length,
+				$WarAndPeace = $('#WarAndPeace'),
+				wH = $(window).height();
+
+
+			for (var i = 0; i < len; i++) {
+				var $row = $('<div class="row" />');
+				var $war = $('<div class="war" />');
+				var $peace = $('<div class="peace" />');
+
+				var ratio = data[i]["value"]["warToPeaceRatio"];
+				var war = data[i]["value"]["warOccurancesPerWords"];
+				var peace = data[i]["value"]["peaceOccurancesPerWords"];
+
+				var multiplier = 100 / (war + peace);
+
+				$row.height(100 / len + "%");
+				$war.width(war * multiplier + "%");
+				$peace.width(peace * multiplier + "%");
+
+				$row.append($war).append($peace);
+
+				$WarAndPeace.append($row);
+			}
+		});
+    });
+</script>
+</body>
+</html>

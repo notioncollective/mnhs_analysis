@@ -12,8 +12,7 @@
 	</style>
 </head>
 <body>
-<div id="War" class="container"></div>
-<div id="Peace" class="container"></div>
+<div id="WarAndPeace" class="container"></div>
 
 
 
@@ -22,20 +21,29 @@
 
 		$.get('http://localhost:3000/mnhs/war_and_peace', function(data) {
 
-			var series = [],
+			var warSeries = [],
+				peaceSeries = [],
+				ratioSeries = [],
 				len = data.length;
 
 			for (var i = 0; i < len; i++) {
-				series.push([
+				warSeries.push([
 					Date.parse(data[i]["_id"]),
-					data[i]["value"]["occurancesPerWords"]
+					data[i]["value"]["warOccurancesPerWords"]
+				]);
+				peaceSeries.push([
+					Date.parse(data[i]["_id"]),
+					data[i]["value"]["peaceOccurancesPerWords"]
+				]);
+				ratioSeries.push([
+					Date.parse(data[i]["_id"]),
+					data[i]["value"]["warToPeaceRatio"]
 				]);	
 			}
 
-			console.log(series);
-	        $('#War').highcharts({
+	        $('#WarAndPeace').highcharts({
 	            chart: {
-	                type: 'scatter',
+	                type: 'area',
 	                zoomType: 'x'
 	            },
 	            title: {
@@ -60,6 +68,17 @@
 	                },
 	                min: 0
 	            },
+	            plotOptions: {
+	                area: {
+	                    stacking: 'normal',
+	                    lineColor: '#666666',
+	                    lineWidth: 1,
+	                    marker: {
+	                        lineWidth: 1,
+	                        lineColor: '#666666'
+	                    }
+	                }
+	            },
 	            tooltip: {
 	                headerFormat: '<b>{series.name}</b><br>',
 	                pointFormat: '{point.x:%e %b %Y}: {point.y}'
@@ -68,12 +87,25 @@
 	            	enabled: false
 	            },
 	            series: [{
-	                name: 'Number of Occurances / Total Words',
+	                name: '"war" / Total Words',
 	                // Define the data points. All series have a dummy year
 	                // of 1970/71 in order to be compared on the same x axis. Note
 	                // that in JavaScript, months start at 0 for January, 1 for February etc.
-	                data: series
-	            }]
+	                data: warSeries
+	            },{
+	                name: '"peace" / Total Words',
+	                // Define the data points. All series have a dummy year
+	                // of 1970/71 in order to be compared on the same x axis. Note
+	                // that in JavaScript, months start at 0 for January, 1 for February etc.
+	                data: peaceSeries
+	            },{
+	                name: 'war to peace ratio',
+	                // Define the data points. All series have a dummy year
+	                // of 1970/71 in order to be compared on the same x axis. Note
+	                // that in JavaScript, months start at 0 for January, 1 for February etc.
+	                data: ratioSeries
+	            }
+	            ]
 	        });
 		});
     });

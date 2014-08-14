@@ -63,9 +63,6 @@ function map() {
         }
     };
 
-    // if there are no occurances, do not emit anything.
-    // UPDATE: I think it makes more sense to return a zero here rather than omit the record
-    // if (totalWords == 0) return;
     var date = new Date(this.date_issued);
     var month = new Date(date.setDate(1));
 

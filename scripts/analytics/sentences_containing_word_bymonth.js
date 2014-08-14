@@ -12,12 +12,15 @@ if (process.argv.length < 3) {
 }
 
 var searchWord = process.argv[2],
-    regex = new RegExp(searchWord, "i");
+    searchWordPadded = " "+searchWord+" ",
+    regex = new RegExp("\s+"+searchWord+"\s+", "i");
 
 MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
     if (err) throw err;
 
     var editions = db.collection('editions');
+
+    console.log('connected, attempting mapReduce');
 
     editions.mapReduce(map, reduce, {
             // if we want to ONLY return docs that contain the search term:
@@ -28,17 +31,16 @@ MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
 
             // The scope provides variables to the map/reduce functions
             scope: {
-                REGEX: regex,
-                OCR_EMPTY_STR: 'no_text'
+                regex: regex,
+                OCR_EMPTY_STR: 'no_text',
+                SEARCH_WORD: searchWordPadded
             },
 
             // sort the INPUT records
             // sort: {},
-            
-            finalize: finalize,
 
             // collection into which the result will be saved
-            out: searchWord + "_per_total_words_bymonth"
+            out: searchWord + "_sentences_bymonth"
         },
 
         function(err, results) {
@@ -52,10 +54,12 @@ MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
 
 function map() {
     // console.log('map!');
+
     var pages = this.pages,
         numPages = pages.length,
-        totalWords = 0,
+        totalSentencesWithWord = 0,
         totalOccurances = 0,
+        sentencesWithWord = [],
         hasOcrContent = false;
 
     for (var i = 0; i < numPages; i++) {
@@ -68,20 +72,23 @@ function map() {
         // this one has some ocr content
         hasOcrContent = true;
 
-        // find all matchs of non-whitespace sequences
-        var words = ocr.match(/\S+/g);
+        // find all matchs of of non-whitespace sequences
+        var sentenceRegex = new RegExp(/["']?([A-Z]((?!([A-Za-z]{2,}|\d+)[.?!]+["']?\s+["']?[A-Z]).)*)(((Mr|Ms|Mrs|Dr|Capt|Col)\.\s+((?!\w{2,}[.?!]['"]?\s+["']?[A-Z]).)*)?)*((?![.?!]["']?\s+["']?[A-Z]).)*[.?!]+["']?/gm);
 
-        var searchTerms = ocr.match(/\s+war\s+/gi);
 
-        // if there are no words, go to next page
-        if (words == null) {
+        var sentences = ocr.match(sentenceRegex);
+
+        // if we have matched sentences, loop through the array and look for sentences containing the searchTerm
+        if (sentences == null) {
             continue;
         } else {
-            // print('words: ' + words.length);
-            totalWords += words.length;
-            if (searchTerms !== null) {
-                print('searchMatches: ' + searchTerms.length);
-                totalOccurances += searchTerms.length;
+            print("sentences: " + sentences.length);
+            for(var i in sentences) {
+                if (sentences[i].indexOf(SEARCH_WORD) !== -1) {
+                    // match
+                    sentencesWithWord.push(sentences[i]);
+                    totalSentencesWithWord += 1;
+                }
             }
         }
     }
@@ -91,30 +98,26 @@ function map() {
 
     // for each newspaper edition, emit the total word count
     if (hasOcrContent) {
+        // print('emiting ' + month.toISOString() + ' | totalSentencesWithWord: ' + totalSentencesWithWord);
         emit(month.toISOString(), {
-            totalWords: totalWords,
-            totalOccurances: totalOccurances
+            totalSentencesWithWord: totalSentencesWithWord,
+            sentencesWithWord: sentencesWithWord
         });
     }
 }
 
 function reduce(key, values) {
     var result = {
-            totalWords: 0,
-            totalOccurances: 0
+            totalSentencesWithWord: 0,
+            sentencesWithWord: 0
         };
 
     var len = values.length;
 
     for (var i = 0; i < len; i++) {
-        result.totalOccurances += values[i].totalOccurances;
-        result.totalWords += values[i].totalWords;
+        result.totalSentencesWithWord += values[i].totalSentencesWithWord;
+        result.sentencesWithWord.concat(values[i].sentencesWithWord);
     }
 
     return result;
-}
-
-function finalize(key, reducedValue) {
-    reducedValue.occurancesPerWords = reducedValue.totalOccurances / reducedValue.totalWords;
-    return reducedValue;
 }
