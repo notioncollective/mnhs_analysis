@@ -50,6 +50,7 @@
 		target = target || 100;
 
 		var wholeSum = 0,
+			wholeRemainder = 0,
 			count = l.length;
 
 		// 1. multiply by target to get whole numbers and remainders
@@ -60,8 +61,13 @@
 
 			// 2. sum up whole numbers
 			wholeSum += el.wholeNumber;
+
 			console.log(el);
 		});
+
+		if (wholeSum === 100) {
+			return;
+		}
 
 	    // 3. sort by remainder from high to low
 	    var sorted = _.sortBy(l, "remainder").reverse();
@@ -96,13 +102,13 @@
 			"#706756"
 		];
 
-		$.get('http://localhost:3000/mnhs/pleasure_pain_by_year	', function(data) {
+		$.get('http://localhost:3000/mnhs/drugs_by_month	', function(data) {
 
 			var len = data.length,
 				$Container = $('#Container'),
 				wH = $(window).height(),
 				rowHeight = 100 / len + "%";
-				rowHeight = "20px";
+				// rowHeight = "20px";
 
 
 			for (var i = 0; i < len; i++) {
@@ -131,12 +137,13 @@
 
 			}
 
-			// $(document).on('mouseover', '.row', function() {
-			// 	$(this).height("40px");
-			// });
-			// $(document).on('mouseout', '.row', function() {
-			// 	$(this).height(rowHeight);
-			// });
+			$(document).on('mouseover', '.row', function() {
+				// $(this).height("40px");
+				console.log($(this).data('stats'));
+			});
+			$(document).on('mouseout', '.row', function() {
+				// $(this).height(rowHeight);
+			});
 		});
     });
 </script>

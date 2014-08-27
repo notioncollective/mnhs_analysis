@@ -17,9 +17,9 @@
 10 error You can get their info via:
 10 error     npm owner ls data_server
 10 error There is likely additional logging output above.
-11 error System Darwin 13.2.0
+11 error System Darwin 13.3.0
 12 error command "node" "/usr/local/bin/npm" "start"
-13 error cwd /Volumes/BigBro/jmw/Projects/MNHS/code/data_server
+13 error cwd /Volumes/BigBro/jmw/Projects/MNHS/mnhs_analysis/data_server
 14 error node -v v0.10.28
 15 error npm -v 1.4.9
 16 error code ELIFECYCLE
