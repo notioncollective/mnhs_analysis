@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
+<html>
+<head>
+	<title>Issues Per Week</title>
+	<script type="text/javascript" src="libs/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="libs/lodash.js"></script>
+	<script type="text/javascript" src="bower_components/d3/d3.js"></script>
+	<style type="text/css">
+		body, html {
+			padding: 0;
+			margin: 0;
+			height: 100%;
+		}
+		.container, .header {
+			display: block;
+			position: relative;
+			width: 100%;
+			padding: 0px;
+			margin: 0px;
+			/*height: 100%;*/
+		}
+		.header {
+			margin-bottom: 1px;
+		}
+		.header text {
+			fill: white;
+			font: 20px sans-serif;
+			text-anchor: middle;
+		}
+		.container text {
+		  fill: white;
+		  font: 10px sans-serif;
+		  text-anchor: start;
+		}
+		.row {
+			position: relative;
+			width: 100%;
+		}
+		.cell {
+			position: relative;
+			height: 100%;
+			float: left;
+		}
+	</style>
+</head>
+<body>
+<svg id="Header" class="header"></svg>
+<svg id="Container" class="container"></svg>
+
+
+
+<script type="text/javascript">
+
+	var wW, wH;
+
+	/**
+	 * takes an array of objects like: 
+	 * {
+	 * 		name: [name],
+	 * 		value: [value]
+	 * }
+	 * @param  {[type]} l      [description]
+	 * @param  {[type]} target [description]
+	 * @return {[type]}        [description]
+	 */
+	function lrm_round(l, target) {
+		target = target || 100;
+
+		var wholeSum = 0,
+			count = l.length;
+
+		// 1. multiply by target to get whole numbers and remainders
+		_.forEach(l, function(el, index) {
+			el.occurrances_percent = el.occurrances_percent * target;
+			el.wholeNumber = Math.floor(el.occurrances_percent);
+			el.remainder = el.occurrances_percent - el.wholeNumber;
+
+			// 2. sum up whole numbers
+			wholeSum += el.wholeNumber;
+			// console.log(el);
+		});
+
+	    // 3. sort by remainder from high to low
+	    var sorted = _.sortBy(l, "remainder").reverse();
+
+	    // console.log("sorted: ", sorted);
+
+	    // 4. Add 1 to the whole number components with the associated largest remainders until the sum equals n.
+	    _.forEach(sorted, function(el, index) {
+	    	if (wholeSum === 0 || wholeSum === 100) {
+				el.wholeNumber = 100 / count;
+				return;	    	
+	    	}
+
+
+	    	var valueToAdd = target - wholeSum > 0 ? 1 : -1;
+	    	wholeSum += valueToAdd;
+	    	el.wholeNumber += valueToAdd;
+
+	    	if (target === wholeSum) {
+	    		return false;
+	    	}
+	    });
+
+	    return sorted;
+	}
+
+	/**
+	 * Add width and x position to words
+	 * @param  {[type]} words [description]
+	 * @return {[type]}       [description]
+	 */
+	function calculateDimensions(words) {
+		for (var i=0; i<words.length; i++) {
+			var el = words[i];
+			el.width = (words[i].wholeNumber / 100) * wW;
+			if (i !== 0) {
+				el.x = words[i-1].x + words[i-1].width;
+			} else {
+				el.x = 0;
+			}
+			// console.log(words[i].wholeNumber);
+		}
+	}
+
+	$(function () {
+
+		var COLORS = [
+			"#DDA31B",
+			"#57B9D2",
+			"#DED4C8",
+			"#D35D00",
+			"#706756"
+		];
+
+		// $.get('http://localhost:3000/mnhs/pleasure_pain_by_year', function(data) {
+		$.get('http://localhost:3000/mnhs/booze_by_month', function(data) {
+		// $.get('http://localhost:3000/mnhs/war_peace_by_month', function(data) {
+
+			// d3.select(".container")
+			//   .selectAll("div")
+			//     .data(data)
+			//   .enter().append("div")
+			//     .style("width", function(d) { console.log(d) })
+			//     .text(function(d) { return d.value.words[0].occurrances_percent; });
+
+			wH = $(window).height();
+			wW = $(window).width();
+
+			var len = data.length,
+				numWords = data[0].value.words.length,
+				$Container = $('#Container'),
+				// rowHeight = 100 / len + "%";
+				rowHeight = "20",
+				headerHeight = "60";
+				// rowHeight = wH / len * 2;
+
+
+			// process data - calculates lrm percents -- could/should this be done in the reduce function?
+			for (var i = 0; i < len; i++) {
+
+				var words = data[i]["value"]["words"];
+
+				// correctly round the percentages on words 
+				lrm_round(words);
+
+				// calculate the width and x positions for each rectangle based on the percentages
+				calculateDimensions(words);
+			}
+
+			var width = wW,
+			    barHeight = rowHeight;
+
+
+
+			
+			var header = d3.select(".header")
+			    .attr("width", width)
+			    .attr("height", headerHeight);
+
+			var headings = header.selectAll('g')
+					.data(data[0]['value']['words'])
+				.enter().append('g')
+					.attr("transform", function(d, i) {
+				    	return "translate(" + i * wW / numWords + ", 0)"; 
+				    });
+
+			headings.append('rect')
+				.attr('width', (wW / numWords))
+			    .attr('height', headerHeight)
+			    .attr("fill", function(d, i) {
+			    	return COLORS[i];
+			    });
+
+			headings.append('text')
+				.attr("x", function(d) { 
+			    	return wW / numWords / 2;
+			    })
+			    .attr("y", headerHeight / 2)
+			    .attr("dy", ".35em")
+			    .text(function(d) {
+			    	console.log(d.word);
+			    	return d.word; 
+			    });
+
+
+
+
+			var chart = d3.select(".container")
+			    .attr("width", width)
+			    .attr("height", barHeight * data.length);
+
+
+			var bar = chart.selectAll("g")
+			    .data(data)
+			  .enter().append("g")
+			    .attr("transform", function(d, i) {
+			    	return "translate(0," + i * barHeight + ")"; 
+			    });
+
+			for (var j = 0; j < data[0].value.words.length; j++) {
+				bar.append("rect")
+					.attr("x", function(d) {
+						return (d.value.words[j].x);
+					})
+				    .attr("width", function(d) { 
+				    	var w = (d.value.words[j].wholeNumber / 100) * width;
+				    	// console.log(w);
+				    	return w; 
+				    })
+				    .attr("height", barHeight - 1)
+				    .attr("fill", COLORS[j]);
+			}
+
+			
+			bar.append("text")
+			    .attr("x", function(d) { 
+			    	return 3; 
+			    })
+			    .attr("y", barHeight / 2)
+			    .attr("dy", ".35em")
+			    .text(function(d) {
+			    	var date = new Date(d['_id']);
+			    	return date.getUTCFullYear(); 
+			    });
+
+			// $(document).on('mouseover', '.row', function() {
+			// 	$(this).height("40px");
+			// });
+			// $(document).on('mouseout', '.row', function() {
+			// 	$(this).height(rowHeight);
+			// });
+		});
+    });
+</script>
+</body>
+</html>

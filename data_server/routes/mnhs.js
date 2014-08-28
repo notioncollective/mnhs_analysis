@@ -112,12 +112,12 @@ router.get('/war_and_peace_by_year', function(req, res) {
     });
 });
 
-router.get('/war_and_peace_by_month', function(req, res) {
+router.get('/war_peace_by_month', function(req, res) {
     // res.send('respond with a resource');
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var war_occurances_bydate = db.collection('war_peace_occurrances_per_total_bymonth');
+        var war_occurances_bydate = db.collection('war_peace_occurrances_per_total_by_month');
 
         war_occurances_bydate
             // throwing out outliers...
