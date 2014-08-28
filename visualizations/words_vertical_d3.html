@@ -136,15 +136,12 @@
 
 		// $.get('http://localhost:3000/mnhs/pleasure_pain_by_year', function(data) {
 		// $.get('http://localhost:3000/mnhs/booze_by_month', function(data) {
-		$.get('http://localhost:3000/mnhs/booze_by_year', function(data) {
+		// $.get('http://localhost:3000/mnhs/booze_by_year', function(data) {
+		$.get('http://localhost:3000/mnhs/whiskey_whisky_by_year', function(data) {
 		// $.get('http://localhost:3000/mnhs/war_peace_by_month', function(data) {
 
-			// d3.select(".container")
-			//   .selectAll("div")
-			//     .data(data)
-			//   .enter().append("div")
-			//     .style("width", function(d) { console.log(d) })
-			//     .text(function(d) { return d.value.words[0].occurrances_percent; });
+			// ignore first two years as they are likely outliers
+			data.splice(0,2);
 
 			wH = $(window).height();
 			wW = $(window).width();

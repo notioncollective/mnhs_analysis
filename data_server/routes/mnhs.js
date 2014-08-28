@@ -200,6 +200,50 @@ router.get('/booze_by_month', function(req, res) {
     });
 });
 
+router.get('/booze_by_year', function(req, res) {
+    // res.send('respond with a resource');
+    MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
+        if (err) throw err;
+
+        var beer_wine_whiskey_occurrances_per_total_bymonth = db.collection('beer_wine_whiskey_rum_moonshine_occurrances_per_total_by_year');
+
+        beer_wine_whiskey_occurrances_per_total_bymonth
+            // throwing out outliers...
+            .find()
+            .sort({
+                _id: 1
+            })
+            .toArray(function(err, docs) {
+                if (err) console.log(err);
+                res.send(docs);
+                db.close();
+
+            });
+    });
+});
+
+router.get('/whiskey_whisky_by_year', function(req, res) {
+    // res.send('respond with a resource');
+    MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
+        if (err) throw err;
+
+        var beer_wine_whiskey_occurrances_per_total_bymonth = db.collection('whiskey_whisky_occurrances_per_total_by_year');
+
+        beer_wine_whiskey_occurrances_per_total_bymonth
+            // throwing out outliers...
+            .find()
+            .sort({
+                _id: 1
+            })
+            .toArray(function(err, docs) {
+                if (err) console.log(err);
+                res.send(docs);
+                db.close();
+
+            });
+    });
+});
+
 router.get('/words_by_month', function(req, res) {
     // res.send('respond with a resource');
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
