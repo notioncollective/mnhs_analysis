@@ -4,14 +4,14 @@ var MongoClient = require('mongodb').MongoClient,
     format = require('util').format;
 
 /* GET users listing. */
-router.get('/occurances_bydate', function(req, res) {
+router.get('/occurrences_bydate', function(req, res) {
     // res.send('respond with a resource');
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var occurances_bydate = db.collection('influenza_occurances_bydate');
+        var occurrences_bydate = db.collection('influenza_occurrences_bydate');
 
-        occurances_bydate
+        occurrences_bydate
             .find({})
             .sort({
                 _id: 1
@@ -25,14 +25,14 @@ router.get('/occurances_bydate', function(req, res) {
     });
 });
 
-router.get('/influenza_occurances_per_issue_per_week', function(req, res) {
+router.get('/influenza_occurrences_per_issue_per_week', function(req, res) {
     // res.send('respond with a resource');
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var occurances_bydate = db.collection('typhoid_occurances_per_issue_per_week');
+        var occurrences_bydate = db.collection('typhoid_occurrences_per_issue_per_week');
 
-        occurances_bydate
+        occurrences_bydate
             .find({})
             .sort({
                 _id: 1
@@ -46,16 +46,16 @@ router.get('/influenza_occurances_per_issue_per_week', function(req, res) {
     });
 });
 
-router.get('/war_occurances_per_month', function(req, res) {
+router.get('/war_occurrences_per_month', function(req, res) {
     // res.send('respond with a resource');
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var occurances_bydate = db.collection('war_per_total_words_bymonth');
+        var occurrences_bydate = db.collection('war_per_total_words_bymonth');
 
-        occurances_bydate
+        occurrences_bydate
             // throwing out outliers...
-            .find({"value.occurancesPerWords": { $ne: 0 }})
+            .find({"value.occurrencesPerWords": { $ne: 0 }})
             .sort({
                 _id: 1
             })
@@ -68,16 +68,16 @@ router.get('/war_occurances_per_month', function(req, res) {
     });
 });
 
-router.get('/peace_occurances_per_month', function(req, res) {
+router.get('/peace_occurrences_per_month', function(req, res) {
     // res.send('respond with a resource');
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var occurances_bydate = db.collection('peace_per_total_words_bymonth');
+        var occurrences_bydate = db.collection('peace_per_total_words_bymonth');
 
-        occurances_bydate
+        occurrences_bydate
             // throwing out outliers...
-            .find({"value.occurancesPerWords": { $ne: 0 }})
+            .find({"value.occurrencesPerWords": { $ne: 0 }})
             .sort({
                 _id: 1
             })
@@ -95,9 +95,9 @@ router.get('/war_and_peace_by_year', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var war_occurances_bydate = db.collection('war_and_peace_per_total_words_byyear');
+        var war_occurrences_bydate = db.collection('war_and_peace_per_total_words_byyear');
 
-        war_occurances_bydate
+        war_occurrences_bydate
             // throwing out outliers...
             .find()
             .sort({
@@ -117,9 +117,9 @@ router.get('/war_peace_by_month', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var war_occurances_bydate = db.collection('war_peace_occurrances_per_total_by_month');
+        var war_occurrences_bydate = db.collection('war_peace_occurrences_per_total_by_month');
 
-        war_occurances_bydate
+        war_occurrences_bydate
             // throwing out outliers...
             .find()
             .sort({
@@ -139,9 +139,9 @@ router.get('/pleasure_pain_by_year', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var pleasure_pain_occurrances_per_total_by_month = db.collection('pleasure_pain_occurrances_per_total_by_year');
+        var pleasure_pain_occurrences_per_total_by_month = db.collection('pleasure_pain_occurrences_per_total_by_year');
 
-        pleasure_pain_occurrances_per_total_by_month
+        pleasure_pain_occurrences_per_total_by_month
             // throwing out outliers...
             .find()
             .sort({
@@ -161,9 +161,9 @@ router.get('/drugs_by_month', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var alcohol_cocaine_marijuana_heroin_opium_occurrances_per_total_by_month = db.collection('alcohol_cocaine_marijuana_heroin_opium_occurrances_per_total_by_month');
+        var alcohol_cocaine_marijuana_heroin_opium_occurrences_per_total_by_month = db.collection('alcohol_cocaine_marijuana_heroin_opium_occurrences_per_total_by_month');
 
-        alcohol_cocaine_marijuana_heroin_opium_occurrances_per_total_by_month
+        alcohol_cocaine_marijuana_heroin_opium_occurrences_per_total_by_month
             // throwing out outliers...
             .find()
             .sort({
@@ -183,9 +183,9 @@ router.get('/booze_by_month', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var beer_wine_whiskey_occurrances_per_total_bymonth = db.collection('beer_wine_whiskey_rum_moonshine_occurrances_per_total_by_month');
+        var beer_wine_whiskey_occurrences_per_total_bymonth = db.collection('beer_wine_whiskey_rum_moonshine_occurrences_per_total_by_month');
 
-        beer_wine_whiskey_occurrances_per_total_bymonth
+        beer_wine_whiskey_occurrences_per_total_bymonth
             // throwing out outliers...
             .find()
             .sort({
@@ -205,9 +205,9 @@ router.get('/booze_by_year', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var beer_wine_whiskey_occurrances_per_total_bymonth = db.collection('beer_wine_whiskey_rum_moonshine_occurrances_per_total_by_year');
+        var beer_wine_whiskey_occurrences_per_total_bymonth = db.collection('beer_wine_whiskey_rum_moonshine_occurrences_per_total_by_year');
 
-        beer_wine_whiskey_occurrances_per_total_bymonth
+        beer_wine_whiskey_occurrences_per_total_bymonth
             // throwing out outliers...
             .find()
             .sort({
@@ -227,9 +227,9 @@ router.get('/whiskey_whisky_by_year', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var beer_wine_whiskey_occurrances_per_total_bymonth = db.collection('whiskey_whisky_occurrances_per_total_by_year');
+        var beer_wine_whiskey_occurrences_per_total_bymonth = db.collection('whiskey_whisky_occurrences_per_total_by_year');
 
-        beer_wine_whiskey_occurrances_per_total_bymonth
+        beer_wine_whiskey_occurrences_per_total_bymonth
             // throwing out outliers...
             .find()
             .sort({
@@ -249,9 +249,9 @@ router.get('/words_by_month', function(req, res) {
     MongoClient.connect('mongodb://127.0.0.1:27017/mnhs', function(err, db) {
         if (err) throw err;
 
-        var pleasure_pain_occurrances_per_total_by_month = db.collection('pleasure_pain_occurrances_per_total_by_month');
+        var pleasure_pain_occurrences_per_total_by_month = db.collection('pleasure_pain_occurrences_per_total_by_month');
 
-        pleasure_pain_occurrances_per_total_by_month
+        pleasure_pain_occurrences_per_total_by_month
             // throwing out outliers...
             .find()
             .sort({

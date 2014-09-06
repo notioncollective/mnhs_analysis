@@ -7,7 +7,7 @@
 	<style type="text/css">
 		.container {
 			width: 100%;
-			height: 500px;
+			height: 300px;
 		}
 	</style>
 </head>
@@ -20,7 +20,7 @@
 <script type="text/javascript">
 	$(function () {
 
-		$.get('http://localhost:3000/mnhs/war_and_peace', function(data) {
+		$.get('http://localhost:3000/mnhs/war_occurrences_per_month', function(data) {
 
 			var series = [],
 				len = data.length;
@@ -28,7 +28,7 @@
 			for (var i = 0; i < len; i++) {
 				series.push([
 					Date.parse(data[i]["_id"]),
-					data[i]["value"]["occurancesPerWords"]
+					data[i]["value"]["occurrencesPerWords"]
 				]);	
 			}
 
@@ -39,7 +39,7 @@
 	                zoomType: 'x'
 	            },
 	            title: {
-	                text: 'Monthly occurances of the word "war" per total words'
+	                text: 'Monthly occurrences of the word "war" per total words'
 	            },
 	            subtitle: {
 	                // text: 'Irregular time data in Highcharts JS'

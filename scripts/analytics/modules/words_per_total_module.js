@@ -66,8 +66,8 @@ function _executeQuery(config) {
  * @param {[type]} aggLev [description]
  */
 function _setAggregationLevel(aggLev) {
-    if (aggLev !== 'week' && aggLev !== 'month' && aggLev !== 'year') {
-        console.log('The first argument must be an aggregation level: week, month, or year');
+    if (aggLev !== 'issue' && aggLev !== 'day' && aggLev !== 'week' && aggLev !== 'month' && aggLev !== 'year') {
+        console.log('The first argument must be an aggregation level: issue, day, week, month, or year');
         process.exit(0);
     } else {
         _aggLev = aggLev;
@@ -83,7 +83,7 @@ function _setAggregationLevel(aggLev) {
  * 
  * _generateCollectionName(['war', 'peace'])
  *
- * // returns war_peace_occurances_per_total_by_month
+ * // returns war_peace_occurrences_per_total_by_month
  *
  * 
  * @param  {[type]} config [description]
@@ -94,7 +94,7 @@ function _generateCollectionName(config) {
     for (var word in config) {
         collectionName += config[word] + "_";
     };
-    collectionName += "occurrances_per_total_by_" + _aggLev;
+    collectionName += "occurrences_per_total_by_" + _aggLev;
     console.log('creating collection: ' + collectionName);
     return collectionName;
 }
@@ -115,9 +115,9 @@ function map() {
     for (var l = 0; l < CONFIG.length; l++) {
         output.words.push({
             word: CONFIG[l],
-            total_occurrances: 0,
-            occurrances_per_total: 0,
-            occurrances_percent: 0
+            total_occurrences: 0,
+            occurrences_per_total: 0,
+            occurrences_percent: 0
         });
     }
 
@@ -154,25 +154,35 @@ function map() {
             for (var k in CONFIG) {
                 if (results[CONFIG[k]] !== null) {
                     // print("results[CONFIG[k]].length: " + results[CONFIG[k]].length);
-                    output.words[k].total_occurrances += results[CONFIG[k]].length;
+                    output.words[k].total_occurrences += results[CONFIG[k]].length;
                 }
             }
         }
     }
 
     var date = new Date(this.date_issued),
-        emitDate;
+        emitDate,
+        emitKey;
 
     switch (AGG_LEVEL) {
+        case "issue":
+            emitKey = this['_id'];
+            break;
+        case "day":
+            emitKey = date.toISOString();
+            break;
         case "week":
             var first = date.getDate() - date.getDay();
             emitDate = new Date(date.setDate(first));
+            emitKey = emitDate.toISOString();
             break;
         case "month":
             emitDate = new Date(date.getFullYear(), date.getMonth(), 1);
+            emitKey = emitDate.toISOString();
             break;
         case "year":
             emitDate = new Date(date.getFullYear(), 1, 1);
+            emitKey = emitDate.toISOString();
             break;
     }
 
@@ -180,11 +190,11 @@ function map() {
 
     // for each newspaper edition, emit the total word count
     if (hasOcrContent) {
-        emit(emitDate.toISOString(), output);
+        emit(emitKey, output);
     }
 }
 
-// Aggregate occurrances and total words
+// Aggregate occurrences and total words
 function reduce(key, values) {
     var result = {
         totalWords: 0,
@@ -195,7 +205,7 @@ function reduce(key, values) {
     for (var a in CONFIG) {
         result.words[a] = {
             word: CONFIG[a],
-            total_occurrances: 0
+            total_occurrences: 0
         };
     }
 
@@ -207,7 +217,7 @@ function reduce(key, values) {
         // loop through config and process each entry
         for (var j in CONFIG) {
             // sum values for this year
-            result.words[j].total_occurrances += values[i].words[j].total_occurrances;
+            result.words[j].total_occurrences += values[i].words[j].total_occurrences;
         };
     }
 
@@ -216,16 +226,16 @@ function reduce(key, values) {
 
 // Add additional metrics based on reduces values
 function finalize(key, reducedValue) {
-    var summed_occurrances_per_total = 0;
+    var summed_occurrences_per_total = 0;
 
     for (var i in CONFIG) {
-        reducedValue.words[i].occurrances_per_total = reducedValue.words[i].total_occurrances / reducedValue.totalWords;
-        summed_occurrances_per_total += reducedValue.words[i].occurrances_per_total;
+        reducedValue.words[i].occurrences_per_total = reducedValue.words[i].total_occurrences / reducedValue.totalWords;
+        summed_occurrences_per_total += reducedValue.words[i].occurrences_per_total;
     }
 
-    // sum word occurrances per total words, then find percent that each word represents from that total
+    // sum word occurrences per total words, then find percent that each word represents from that total
     for (var j in CONFIG) {
-        reducedValue.words[j].occurrances_percent = summed_occurrances_per_total ? reducedValue.words[j].occurrances_per_total / summed_occurrances_per_total : 0;
+        reducedValue.words[j].occurrences_percent = summed_occurrences_per_total ? reducedValue.words[j].occurrences_per_total / summed_occurrences_per_total : 0;
     }
 
     return reducedValue;

@@ -63,11 +63,11 @@ function map() {
         }
     };
 
-    // if there are no occurances, do not emit anything.
+    // if there are no occurrences, do not emit anything.
     // UPDATE: I think it makes more sense to return a zero here rather than omit the record
     // if (totalWords == 0) return;
 
-    // for each newspaper edition, emit the total occurances of the word:
+    // for each newspaper edition, emit the total occurrences of the word:
     if(hasOcrContent) {
         emit(this._id, { number_of_words: totalWords });
     }

@@ -9,9 +9,9 @@
  *
  * $ node words_per_total_cli.js month war peace
  *
- * The example here will find the occurances of the words 'war' and 'peace' per total words, aggregated by month.
+ * The example here will find the occurrences of the words 'war' and 'peace' per total words, aggregated by month.
  * 
- * The new collection will be called 'war_peace_occurrances_per_total_by_month' and will contain objects in the following format:
+ * The new collection will be called 'war_peace_occurrences_per_total_by_month' and will contain objects in the following format:
  *
  * {
  *    "_id" : "1856-01-01T05:00:00.000Z",
@@ -20,15 +20,15 @@
  *        "words" : [
  *            {
  *                "word" : "war",
- *                "total_occurrances" : 2,
- *                "occurrances_per_total" : 0.00007362956963516548,
- *                "occurrances_percent" : 0.39999999999999997
+ *                "total_occurrences" : 2,
+ *                "occurrences_per_total" : 0.00007362956963516548,
+ *                "occurrences_percent" : 0.39999999999999997
  *            },
  *            {
  *                "word" : "peace",
- *                "total_occurrances" : 3,
- *                "occurrances_per_total" : 0.00011044435445274823,
- *                "occurrances_percent" : 0.6
+ *                "total_occurrences" : 3,
+ *                "occurrences_per_total" : 0.00011044435445274823,
+ *                "occurrences_percent" : 0.6
  *            }
  *        ]
  *    }
@@ -48,8 +48,8 @@ if (process.argv.length < 4) {
     process.exit(0);
 } else {
     aggLev = process.argv[2];
-    if (aggLev !== 'week' && aggLev !== 'month' && aggLev !== 'year') {
-        console.log('The first argument must be an aggregation level: week, month, or year');
+    if (aggLev !== 'issue' && aggLev !== 'day' && aggLev !== 'week' && aggLev !== 'month' && aggLev !== 'year') {
+        console.log('The first argument must be an aggregation level: issue, day, week, month, or year');
         process.exit(0);
     }
     for (var i = 3; i < process.argv.length; i++) {

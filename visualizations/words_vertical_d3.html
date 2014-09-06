@@ -72,9 +72,9 @@
 
 		// 1. multiply by target to get whole numbers and remainders
 		_.forEach(l, function(el, index) {
-			el.occurrances_percent = el.occurrances_percent * target;
-			el.wholeNumber = Math.floor(el.occurrances_percent);
-			el.remainder = el.occurrances_percent - el.wholeNumber;
+			el.occurrences_percent = el.occurrences_percent * target;
+			el.wholeNumber = Math.floor(el.occurrences_percent);
+			el.remainder = el.occurrences_percent - el.wholeNumber;
 
 			// 2. sum up whole numbers
 			wholeSum += el.wholeNumber;
@@ -134,10 +134,10 @@
 			"#706756"
 		];
 
-		// $.get('http://localhost:3000/mnhs/pleasure_pain_by_year', function(data) {
+		$.get('http://localhost:3000/mnhs/pleasure_pain_by_year', function(data) {
 		// $.get('http://localhost:3000/mnhs/booze_by_month', function(data) {
 		// $.get('http://localhost:3000/mnhs/booze_by_year', function(data) {
-		$.get('http://localhost:3000/mnhs/whiskey_whisky_by_year', function(data) {
+		// $.get('http://localhost:3000/mnhs/whiskey_whisky_by_year', function(data) {
 		// $.get('http://localhost:3000/mnhs/war_peace_by_month', function(data) {
 
 			// ignore first two years as they are likely outliers

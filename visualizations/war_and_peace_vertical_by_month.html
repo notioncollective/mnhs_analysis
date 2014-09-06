@@ -109,15 +109,15 @@
 				var $peace = $('<div class="peace" />');
 
 				// var ratio = data[i]["value"]["warToPeaceRatio"];
-				console.log(data[i]["value"]["war_occurrance_percent"], data[i]["value"]["peace_occurrance_percent"]);
+				console.log(data[i]["value"]["war_occurrence_percent"], data[i]["value"]["peace_occurrence_percent"]);
 
 				// do the correct rounding so that our percentages add up to 100%
 				var percentages = lrm_round([{
 					"name": "war",
-					"value": data[i]["value"]["war_occurrance_percent"]
+					"value": data[i]["value"]["war_occurrence_percent"]
 				},{
 					"name": "peace",
-					"value": data[i]["value"]["peace_occurrance_percent"]
+					"value": data[i]["value"]["peace_occurrence_percent"]
 				}]);
 
 				$row.height(rowHeight + "%");

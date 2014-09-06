@@ -78,7 +78,7 @@ function _setAggregationLevel(aggLev) {
  * 
  * _generateCollectionName(['war', 'peace'])
  *
- * // returns war_peace_occurances_per_total_by_month
+ * // returns war_peace_occurrences_per_total_by_month
  *
  * 
  * @param  {[type]} searchTerm [description]
@@ -162,7 +162,7 @@ function map() {
     }
 }
 
-// Aggregate occurrances and total words
+// Aggregate occurrences and total words
 function reduce(key, values) {
     var result = {
         numSentences: 0,
@@ -181,16 +181,16 @@ function reduce(key, values) {
 
 // Add additional metrics based on reduces values
 function finalize(key, reducedValue) {
-    var summed_occurrances_per_total = 0;
+    var summed_occurrences_per_total = 0;
 
     for (var i in CONFIG) {
-        reducedValue.words[i].occurrances_per_total = reducedValue.words[i].total_occurrances / reducedValue.totalWords;
-        summed_occurrances_per_total += reducedValue.words[i].occurrances_per_total;
+        reducedValue.words[i].occurrences_per_total = reducedValue.words[i].total_occurrences / reducedValue.totalWords;
+        summed_occurrences_per_total += reducedValue.words[i].occurrences_per_total;
     }
 
-    // sum word occurrances per total words, then find percent that each word represents from that total
+    // sum word occurrences per total words, then find percent that each word represents from that total
     for (var j in CONFIG) {
-        reducedValue.words[j].occurrances_percent = summed_occurrances_per_total ? reducedValue.words[j].occurrances_per_total / summed_occurrances_per_total : 0;
+        reducedValue.words[j].occurrences_percent = summed_occurrences_per_total ? reducedValue.words[j].occurrences_per_total / summed_occurrences_per_total : 0;
     }
 
     return reducedValue;

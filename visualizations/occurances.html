@@ -17,7 +17,7 @@
 <script type="text/javascript">
 	$(function () {
 
-		$.get('http://localhost:3000/mnhs/influenza_occurances_per_issue_per_week', function(data) {
+		$.get('http://localhost:3000/mnhs/influenza_occurrences_per_issue_per_week', function(data) {
 
 			var series = [],
 				len = data.length;
@@ -25,7 +25,7 @@
 			for (var i = 0; i < len; i++) {
 				series.push([
 					Date.parse(data[i]["_id"]),
-					data[i]["value"]["occurancesPerIssue"]
+					data[i]["value"]["occurrencesPerIssue"]
 				]);	
 			}
 
@@ -59,7 +59,7 @@
 	            },
 	            tooltip: {
 	                headerFormat: '<b>{series.name}</b><br>',
-	                pointFormat: '{point.x:%e %b %Y}: {point.y} occurrances per issue per week'
+	                pointFormat: '{point.x:%e %b %Y}: {point.y} occurrences per issue per week'
 	            },
 
 	            series: [{

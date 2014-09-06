@@ -54,9 +54,9 @@
 
 		// 1. multiply by target to get whole numbers and remainders
 		_.forEach(l, function(el, index) {
-			el.occurrances_percent = el.occurrances_percent * target;
-			el.wholeNumber = Math.floor(el.occurrances_percent);
-			el.remainder = el.occurrances_percent - el.wholeNumber;
+			el.occurrences_percent = el.occurrences_percent * target;
+			el.wholeNumber = Math.floor(el.occurrences_percent);
+			el.remainder = el.occurrences_percent - el.wholeNumber;
 
 			// 2. sum up whole numbers
 			wholeSum += el.wholeNumber;
