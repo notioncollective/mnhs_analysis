@@ -29,11 +29,11 @@
 			for (var i = 0; i < len; i++) {
 				warSeries.push([
 					Date.parse(data[i]["_id"]),
-					data[i]["value"]["warOccurancesPerWords"]
+					data[i]["value"]["warOccurrencesPerWords"]
 				]);
 				peaceSeries.push([
 					Date.parse(data[i]["_id"]),
-					data[i]["value"]["peaceOccurancesPerWords"]
+					data[i]["value"]["peaceOccurrencesPerWords"]
 				]);
 				ratioSeries.push([
 					Date.parse(data[i]["_id"]),
@@ -64,7 +64,7 @@
 	            },
 	            yAxis: {
 	                title: {
-	                    text: 'Occurances / Total Words'
+	                    text: 'Occurrences / Total Words'
 	                },
 	                min: 0
 	            },

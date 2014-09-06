@@ -149,10 +149,10 @@
 			var len = data.length,
 				numWords = data[0].value.words.length,
 				$Container = $('#Container'),
-				// rowHeight = 100 / len + "%";
-				rowHeight = "20",
+				// rowHeight = 100 / len + "%",
+				// rowHeight = "20",
+				rowHeight = wH / len,
 				headerHeight = "60";
-				// rowHeight = wH / len * 2;
 
 
 			// process data - calculates lrm percents -- could/should this be done in the reduce function?
