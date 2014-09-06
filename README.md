@@ -63,7 +63,7 @@ For simple analysis, we use MongoDB's MapReduce features. A few example scripts 
 Once we determined one type of analysis that we wanted to repeat, we created a basic cli tool that would allow us to generate the desired data quickly with different input parameters. The words_per_total_cli.js script is passed an aggregation level followed by the search terms.
 
 ```
-$ node words_per_total_cli.js week|month|year searchTerm1 [searchTerm2] ... [searchTermN]
+$ node words_per_total_cli.js issue|day|week|month|year searchTerm1 [searchTerm2] ... [searchTermN]
 ```
 
 ### Example
